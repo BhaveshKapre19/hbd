@@ -6,7 +6,7 @@ export default function HeaderNav({ lang, setLang }) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [currentTag, setCurrentTag] = useState('');
-  const [selectedTrack, setSelectedTrack] = useState('serenade');
+  const [selectedTrack, setSelectedTrack] = useState('harryPotter');
   const [currentTime, setCurrentTime] = useState('');
   const [showTrackMenu, setShowTrackMenu] = useState(false);
   const [customAudioName, setCustomAudioName] = useState('');
@@ -183,6 +183,21 @@ export default function HeaderNav({ lang, setLang }) {
               </p>
 
               <button
+                onClick={() => handleSelectTrack('harryPotter')}
+                className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium flex items-center justify-between transition-colors ${
+                  selectedTrack === 'harryPotter' && !customAudioName
+                    ? 'bg-[#FAF0DE] text-[#8C6700] font-bold'
+                    : 'text-[#1E1D24] hover:bg-[#FAF6EE]'
+                }`}
+              >
+                <span className="flex items-center gap-2">
+                  <span className="text-sm">⚡</span>
+                  <span>Harry Potter (Hedwig's Theme)</span>
+                </span>
+                <span className="text-[10px] text-[#A17415] font-semibold">Magical</span>
+              </button>
+
+              <button
                 onClick={() => handleSelectTrack('serenade')}
                 className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium flex items-center justify-between transition-colors ${
                   selectedTrack === 'serenade' && !customAudioName
@@ -194,37 +209,7 @@ export default function HeaderNav({ lang, setLang }) {
                   <Disc className="w-3.5 h-3.5 text-[#D4A322]" />
                   <span>Serenade for Plam</span>
                 </span>
-                <span className="text-[10px] text-[#8C8275]">Emotional</span>
-              </button>
-
-              <button
-                onClick={() => handleSelectTrack('waltz')}
-                className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium flex items-center justify-between transition-colors ${
-                  selectedTrack === 'waltz' && !customAudioName
-                    ? 'bg-[#FAF0DE] text-[#8C6700] font-bold'
-                    : 'text-[#1E1D24] hover:bg-[#FAF6EE]'
-                }`}
-              >
-                <span className="flex items-center gap-2">
-                  <Disc className="w-3.5 h-3.5 text-[#D4A322]" />
-                  <span>Golden Friendship Waltz</span>
-                </span>
-                <span className="text-[10px] text-[#8C8275]">Waltz</span>
-              </button>
-
-              <button
-                onClick={() => handleSelectTrack('golden')}
-                className={`w-full text-left px-3 py-2 rounded-xl text-xs font-medium flex items-center justify-between transition-colors ${
-                  selectedTrack === 'golden' && !customAudioName
-                    ? 'bg-[#FAF0DE] text-[#8C6700] font-bold'
-                    : 'text-[#1E1D24] hover:bg-[#FAF6EE]'
-                }`}
-              >
-                <span className="flex items-center gap-2">
-                  <Disc className="w-3.5 h-3.5 text-[#D4A322]" />
-                  <span>Bulgarian Rose Celebration</span>
-                </span>
-                <span className="text-[10px] text-[#8C8275]">Joyous</span>
+                <span className="text-[10px] text-[#8C8275]">Acoustic</span>
               </button>
 
               <div className="border-t border-[#ECE0CF] my-1" />

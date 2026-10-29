@@ -1,149 +1,103 @@
-// Polyphonic Acoustic Celebration Synthesizer & Audio Engine
-// Provides lush, cinematic, heartwarming musical arrangements + custom audio support!
+// Magical Celesta & Orchestral Audio Engine
+// Harry Potter - Hedwig's Theme by John Williams (Acoustic Celesta Synthesizer)
 
 class CelebrationAudioManager {
   constructor() {
     this.ctx = null;
     this.isPlaying = false;
-    this.currentTrackId = 'serenade'; // 'serenade', 'waltz', 'golden'
+    this.currentTrackId = 'harryPotter'; // Default: Harry Potter Hedwig's Theme
     this.currentStep = 0;
     this.loopTimer = null;
-    this.volume = 0.65;
+    this.volume = 0.7;
     this.isMuted = false;
     this.customAudio = null;
     this.onProgressCallback = null;
 
-    // Track definitions
+    // Hedwig's Theme (Harry Potter) accurately transcribed for Celesta
+    // Standard key: E minor
+    // B4=493.88, D#5=622.25, E5=659.25, F5=698.46, F#5=739.99, G5=783.99, G#5=830.61, A5=880.00, A#5=932.33, B5=987.77, C6=1046.50, C#6=1108.73, D6=1174.66
     this.tracks = {
-      // TRACK 1: "Serenade for Plam" - Emotional, heartwarming cinematic melody
+      harryPotter: {
+        title: "⚡ Harry Potter - Hedwig's Theme",
+        tempo: 120, // 3/8 feel
+        steps: [
+          // Mystery drone start & Pickup
+          { drone: 82.41, lead: 493.88, dur: 1.0, tag: "⚡ Hedwig's Theme" }, // B4
+
+          // Phrase 1: E -> G -> F# -> E -> B -> A -> F#
+          { drone: 82.41, lead: 659.25, dur: 1.5, tag: "✨ Welcome to Hogwarts" }, // E5
+          { drone: 82.41, lead: 783.99, dur: 0.75 }, // G5
+          { drone: 82.41, lead: 739.99, dur: 0.75 }, // F#5
+          { drone: 82.41, lead: 659.25, dur: 1.5, tag: "🏰 The Great Hall" }, // E5
+          { drone: 82.41, lead: 987.77, dur: 1.0 }, // B5
+          { drone: 110.00, lead: 880.00, dur: 2.25, tag: "🪄 Lumos Maxima" }, // A5 (A minor pad)
+          { drone: 92.50, lead: 739.99, dur: 2.5, tag: "🦉 Owl Post for Plam" }, // F#5
+
+          // Phrase 2: E -> G -> F# -> D# -> F -> B
+          { drone: 82.41, lead: 659.25, dur: 1.5, tag: "✨ Pure Magic" }, // E5
+          { drone: 82.41, lead: 783.99, dur: 0.75 }, // G5
+          { drone: 82.41, lead: 739.99, dur: 0.75 }, // F#5
+          { drone: 77.78, lead: 622.25, dur: 1.5, tag: "🔮 Secret Spells" }, // D#5
+          { drone: 77.78, lead: 698.46, dur: 0.8 }, // F5
+          { drone: 123.47, lead: 493.88, dur: 2.5, tag: "⭐ Hogwarts Express" }, // B4 (B drone)
+          { drone: 123.47, lead: 0, dur: 0.6 }, // breath pause
+
+          // Phrase 3: B -> E -> G -> F# -> E -> B -> D6 -> C#6 -> C6 -> G#5
+          { drone: 82.41, lead: 493.88, dur: 1.0, tag: "⚡ For Plam Buddy" }, // B4
+          { drone: 82.41, lead: 659.25, dur: 1.5, tag: "🎉 Gryffindor Celebration" }, // E5
+          { drone: 82.41, lead: 783.99, dur: 0.75 }, // G5
+          { drone: 82.41, lead: 739.99, dur: 0.75 }, // F#5
+          { drone: 82.41, lead: 659.25, dur: 1.5, tag: "💖 Golden Snitch" }, // E5
+          { drone: 82.41, lead: 987.77, dur: 1.0 }, // B5
+          { drone: 146.83, lead: 1174.66, dur: 1.5, tag: "🌟 Flying on Broomsticks" }, // D6
+          { drone: 138.59, lead: 1108.73, dur: 0.75 }, // C#6
+          { drone: 130.81, lead: 1046.50, dur: 2.2, tag: "👑 Queen Plamena" }, // C6
+          { drone: 103.83, lead: 830.61, dur: 1.6, tag: "✨ Enchanted Candles" }, // G#5
+
+          // Phrase 4: C6 -> B5 -> A#5 -> D#5 -> G5 -> E5
+          { drone: 130.81, lead: 1046.50, dur: 0.8, tag: "🪄 Magic Birthday!" }, // C6
+          { drone: 123.47, lead: 987.77, dur: 0.8 }, // B5
+          { drone: 116.54, lead: 932.33, dur: 0.8 }, // A#5
+          { drone: 77.78, lead: 622.25, dur: 1.5, tag: "🥂 Toast to Plam!" }, // D#5
+          { drone: 82.41, lead: 783.99, dur: 0.8 }, // G5
+          { drone: 82.41, lead: 659.25, dur: 3.2, tag: "⚡ Честит Рожден Ден, Плам!" }, // E5
+
+          // Interlude / Waltz Theme (The magical sweeping celesta waltz!)
+          { drone: 98.00, lead: 783.99, dur: 1.2, tag: "✨ The Grand Waltz" }, // G5
+          { drone: 98.00, lead: 987.77, dur: 1.2 }, // B5
+          { drone: 98.00, lead: 783.99, dur: 1.2 }, // G5
+          { drone: 98.00, lead: 987.77, dur: 1.2 }, // B5
+          { drone: 130.81, lead: 1046.50, dur: 1.4, tag: "🏰 Hogwarts Castle" }, // C6
+          { drone: 123.47, lead: 987.77, dur: 0.8 }, // B5
+          { drone: 116.54, lead: 932.33, dur: 1.6, tag: "🦉 Flying into the Night" }, // A#5
+          { drone: 92.50, lead: 739.99, dur: 1.4 }, // F#5
+          { drone: 98.00, lead: 783.99, dur: 0.8 }, // G5
+          { drone: 123.47, lead: 987.77, dur: 1.4 }, // B5
+          { drone: 116.54, lead: 932.33, dur: 0.8 }, // A#5
+          { drone: 58.27, lead: 466.16, dur: 1.5, tag: "✨ A Year of Wonder" }, // A#4
+          { drone: 123.47, lead: 493.88, dur: 1.5 }, // B4
+          { drone: 123.47, lead: 987.77, dur: 2.8, tag: "⚡ Mischief Managed!" }, // B5
+          { drone: 82.41, lead: 0, dur: 1.2 }, // breathing space before repeat
+        ]
+      },
+
+      // Backup track: "Serenade for Plam"
       serenade: {
-        title: "Serenade for Plam",
+        title: "🎵 Serenade for Plam",
         tempo: 96,
-        timeSignature: 4,
         steps: [
-          // Bar 1: D Major (Warm, inspiring opening)
-          { bass: 146.83, chord: [293.66, 369.99, 440.00], lead: 587.33, tag: "For Plam ✨" }, // D3, D4-F#4-A4, D5
-          { chord: [369.99, 440.00], lead: 554.37 }, // C#5
-          { chord: [293.66, 440.00], lead: 493.88 }, // B4
-          { chord: [369.99, 440.00], lead: 440.00 }, // A4
-
-          // Bar 2: A Major (Gentle, radiant)
-          { bass: 110.00, chord: [277.18, 329.63, 440.00], lead: 493.88, tag: "Bulgarian Sunshine ☀️" }, // A2, C#4-E4-A4, B4
-          { chord: [329.63, 440.00], lead: 440.00 }, // A4
-          { chord: [277.18, 440.00], lead: 392.00 }, // G4
-          { chord: [329.63, 440.00], lead: 440.00 }, // A4
-
-          // Bar 3: B Minor (Touching, heartfelt depth)
-          { bass: 123.47, chord: [293.66, 369.99, 440.00], lead: 493.88, tag: "Best Friend Ever 💖" }, // B2, D4-F#4-A4, B4
-          { chord: [369.99, 493.88], lead: 587.33 }, // D5
-          { chord: [293.66, 493.88], lead: 659.25 }, // E5
-          { chord: [369.99, 493.88], lead: 587.33 }, // D5
-
-          // Bar 4: F# Minor / A Major (Elevating)
-          { bass: 92.50, chord: [277.18, 369.99, 440.00], lead: 554.37, tag: "Laughter & Joy 🥂" }, // F#2, C#4-F#4-A4, C#5
-          { chord: [369.99, 440.00], lead: 493.88 }, // B4
-          { chord: [277.18, 440.00], lead: 440.00 }, // A4
-          { chord: [369.99, 440.00], lead: 392.00 }, // G4
-
-          // Bar 5: G Major (Climactic warmth)
-          { bass: 98.00, chord: [293.66, 392.00, 493.88], lead: 440.00, tag: "Golden Year Ahead 🌟" }, // G2, D4-G4-B4, A4
-          { chord: [392.00, 493.88], lead: 493.88 }, // B4
-          { chord: [293.66, 493.88], lead: 587.33 }, // D5
-          { chord: [392.00, 493.88], lead: 659.25 }, // E5
-
-          // Bar 6: D Major (Triumphant)
-          { bass: 146.83, chord: [293.66, 369.99, 440.00], lead: 739.99, tag: "Happy Birthday! 👑" }, // D3, F#5
-          { chord: [369.99, 440.00], lead: 659.25 }, // E5
-          { chord: [293.66, 440.00], lead: 587.33 }, // D5
-          { chord: [369.99, 440.00], lead: 554.37 }, // C#5
-
-          // Bar 7: G Major to A Major (Resolution build)
-          { bass: 98.00, chord: [293.66, 392.00, 493.88], lead: 493.88, tag: "Cheers, Plam Buddy! 🥂" }, // B4
-          { chord: [392.00, 493.88], lead: 587.33 }, // D5
-          { bass: 110.00, chord: [277.18, 329.63, 440.00], lead: 659.25 }, // E5
-          { chord: [329.63, 440.00], lead: 554.37 }, // C#5
-
-          // Bar 8: Final Golden Ring
-          { bass: 146.83, chord: [293.66, 369.99, 440.00, 587.33], lead: 587.33, tag: "Celebrate Today! ✨" },
-          { chord: [369.99, 440.00], lead: 0 },
-          { chord: [293.66, 369.99], lead: 0 },
-          { chord: [293.66, 440.00], lead: 0 },
-        ]
-      },
-
-      // TRACK 2: "Golden Friendship Waltz" - Elegant, Parisian & Balkan-tinged luxury 3/4 waltz
-      waltz: {
-        title: "Golden Friendship Waltz",
-        tempo: 120,
-        timeSignature: 3,
-        steps: [
-          // Measure 1: C Major
-          { bass: 130.81, chord: [261.63, 329.63, 392.00], lead: 523.25, tag: "A Toast to You 🥂" },
-          { chord: [329.63, 392.00], lead: 0 },
-          { chord: [329.63, 392.00], lead: 587.33 },
-
-          // Measure 2: E Minor
-          { bass: 164.81, chord: [329.63, 392.00, 493.88], lead: 659.25, tag: "Sparkle & Smile ✨" },
-          { chord: [392.00, 493.88], lead: 0 },
-          { chord: [392.00, 493.88], lead: 587.33 },
-
-          // Measure 3: F Major
-          { bass: 174.61, chord: [261.63, 349.23, 440.00], lead: 523.25, tag: "Cherished Moments 💖" },
-          { chord: [349.23, 440.00], lead: 0 },
-          { chord: [349.23, 440.00], lead: 493.88 },
-
-          // Measure 4: G Major
-          { bass: 196.00, chord: [293.66, 392.00, 493.88], lead: 440.00, tag: "Always By Your Side 🌟" },
-          { chord: [392.00, 493.88], lead: 392.00 },
-          { chord: [293.66, 493.88], lead: 493.88 },
-
-          // Measure 5: A Minor
-          { bass: 110.00, chord: [261.63, 329.63, 440.00], lead: 523.25, tag: "Plam Buddy 👑" },
-          { chord: [329.63, 440.00], lead: 587.33 },
-          { chord: [329.63, 440.00], lead: 659.25 },
-
-          // Measure 6: D Minor
-          { bass: 146.83, chord: [293.66, 349.23, 440.00], lead: 698.46, tag: "Laugh Without Limits 😄" },
-          { chord: [349.23, 440.00], lead: 659.25 },
-          { chord: [349.23, 440.00], lead: 587.33 },
-
-          // Measure 7: G7
-          { bass: 196.00, chord: [293.66, 392.00, 466.16], lead: 523.25, tag: "Make It Magical! 🎉" },
-          { chord: [392.00, 466.16], lead: 493.88 },
-          { chord: [293.66, 493.88], lead: 440.00 },
-
-          // Measure 8: C Major (Resolve)
-          { bass: 130.81, chord: [261.63, 329.63, 392.00, 523.25], lead: 523.25, tag: "Cheers, Plamena! 🥂" },
-          { chord: [329.63, 392.00], lead: 0 },
-          { chord: [261.63, 392.00], lead: 0 },
-        ]
-      },
-
-      // TRACK 3: "Bulgarian Rose Celebration" - Upbeat, rhythmic, joyous folk-pop energy
-      golden: {
-        title: "Bulgarian Rose Celebration",
-        tempo: 124,
-        timeSignature: 4,
-        steps: [
-          { bass: 220.00, chord: [329.63, 440.00, 554.37], lead: 659.25, tag: "Честит Рожден Ден! 🌹" },
-          { chord: [440.00, 554.37], lead: 739.99 },
-          { bass: 220.00, chord: [329.63, 440.00], lead: 659.25 },
-          { chord: [440.00, 554.37], lead: 554.37 },
-
-          { bass: 196.00, chord: [293.66, 392.00, 493.88], lead: 587.33, tag: "Здраве и радост! 🌟" },
-          { chord: [392.00, 493.88], lead: 659.25 },
-          { bass: 196.00, chord: [293.66, 392.00], lead: 587.33 },
-          { chord: [392.00, 493.88], lead: 493.88 },
-
-          { bass: 174.61, chord: [261.63, 349.23, 440.00], lead: 523.25, tag: "Празнувай днес! 🎂" },
-          { chord: [349.23, 440.00], lead: 587.33 },
-          { bass: 174.61, chord: [261.63, 349.23], lead: 523.25 },
-          { chord: [349.23, 440.00], lead: 440.00 },
-
-          { bass: 164.81, chord: [329.63, 415.30, 493.88], lead: 493.88, tag: "Наздраве, Плам! 🥂" },
-          { chord: [415.30, 493.88], lead: 554.37 },
-          { chord: [329.63, 493.88], lead: 659.25 },
-          { chord: [415.30, 493.88], lead: 830.61 },
+          { drone: 146.83, lead: 587.33, dur: 1.0, tag: "For Plam ✨" },
+          { drone: 146.83, lead: 554.37, dur: 1.0 },
+          { drone: 146.83, lead: 493.88, dur: 1.0 },
+          { drone: 146.83, lead: 440.00, dur: 1.0 },
+          { drone: 110.00, lead: 493.88, dur: 1.0, tag: "Bulgarian Sunshine ☀️" },
+          { drone: 110.00, lead: 440.00, dur: 1.0 },
+          { drone: 110.00, lead: 392.00, dur: 1.0 },
+          { drone: 110.00, lead: 440.00, dur: 1.0 },
+          { drone: 123.47, lead: 493.88, dur: 1.0, tag: "Best Friend Ever 💖" },
+          { drone: 123.47, lead: 587.33, dur: 1.0 },
+          { drone: 123.47, lead: 659.25, dur: 1.0 },
+          { drone: 123.47, lead: 587.33, dur: 1.0 },
         ]
       }
     };
@@ -161,23 +115,35 @@ class CelebrationAudioManager {
     }
   }
 
-  playAcousticNote(freq, type = 'lead', duration = 0.8) {
+  // Synthesize authentic magical Celesta chime with Great Hall reverb delay
+  playCelestaNote(freq, duration = 2.0) {
     if (!this.ctx || this.isMuted || freq <= 0) return;
 
     const now = this.ctx.currentTime;
-    const masterGain = this.ctx.createGain();
 
-    const voiceVol = type === 'bass' ? 0.35 : type === 'chord' ? 0.16 : 0.32;
-    masterGain.gain.setValueAtTime(this.volume * voiceVol, now);
+    // Master Gain
+    const masterGain = this.ctx.createGain();
+    masterGain.gain.setValueAtTime(this.volume * 0.42, now);
+
+    // Subtle Echo / Reverb delay for Hogwarts Great Hall acoustic atmosphere
+    const delay = this.ctx.createDelay();
+    delay.delayTime.setValueAtTime(0.28, now);
+    const feedback = this.ctx.createGain();
+    feedback.gain.setValueAtTime(0.25, now);
+    delay.connect(feedback);
+    feedback.connect(delay);
+    delay.connect(this.ctx.destination);
+    masterGain.connect(delay);
     masterGain.connect(this.ctx.destination);
 
+    // 1. Fundamental Pure Sine (Clear crystal bell)
     const osc1 = this.ctx.createOscillator();
     const gain1 = this.ctx.createGain();
-    osc1.type = type === 'bass' ? 'triangle' : 'sine';
+    osc1.type = 'sine';
     osc1.frequency.setValueAtTime(freq, now);
 
-    gain1.gain.setValueAtTime(0.01, now);
-    gain1.gain.linearRampToValueAtTime(0.9, now + 0.04);
+    gain1.gain.setValueAtTime(0.001, now);
+    gain1.gain.linearRampToValueAtTime(0.85, now + 0.008); // sharp bell strike
     gain1.gain.exponentialRampToValueAtTime(0.0001, now + duration);
 
     osc1.connect(gain1);
@@ -185,23 +151,69 @@ class CelebrationAudioManager {
     osc1.start(now);
     osc1.stop(now + duration);
 
-    if (type !== 'bass') {
-      const osc2 = this.ctx.createOscillator();
-      const gain2 = this.ctx.createGain();
-      osc2.type = 'triangle';
-      osc2.frequency.setValueAtTime(freq * 2, now);
+    // 2. Inharmonic Metal Plate Strike (Celesta characteristic: 2.76x frequency)
+    const osc2 = this.ctx.createOscillator();
+    const gain2 = this.ctx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(freq * 2.756, now);
 
-      gain2.gain.setValueAtTime(0.01, now);
-      gain2.gain.linearRampToValueAtTime(0.35, now + 0.02);
-      gain2.gain.exponentialRampToValueAtTime(0.0001, now + duration * 0.65);
+    gain2.gain.setValueAtTime(0.001, now);
+    gain2.gain.linearRampToValueAtTime(0.35, now + 0.005);
+    gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.45); // short metallic ping
 
-      osc2.connect(gain2);
-      gain2.connect(masterGain);
-      osc2.start(now);
-      osc2.stop(now + duration * 0.65);
-    }
+    osc2.connect(gain2);
+    gain2.connect(masterGain);
+    osc2.start(now);
+    osc2.stop(now + 0.45);
+
+    // 3. Shimmer Harmonic (High bell sparkle 4.0x)
+    const osc3 = this.ctx.createOscillator();
+    const gain3 = this.ctx.createGain();
+    osc3.type = 'triangle';
+    osc3.frequency.setValueAtTime(freq * 4.0, now);
+
+    gain3.gain.setValueAtTime(0.001, now);
+    gain3.gain.linearRampToValueAtTime(0.18, now + 0.006);
+    gain3.gain.exponentialRampToValueAtTime(0.0001, now + 0.35);
+
+    osc3.connect(gain3);
+    gain3.connect(masterGain);
+    osc3.start(now);
+    osc3.stop(now + 0.35);
   }
 
+  // Mysterious orchestral string drone underneath
+  playOrchestralDrone(freq, duration = 2.0) {
+    if (!this.ctx || this.isMuted || !freq || freq <= 0) return;
+
+    const now = this.ctx.currentTime;
+    const droneGain = this.ctx.createGain();
+    droneGain.gain.setValueAtTime(this.volume * 0.18, now);
+    droneGain.connect(this.ctx.destination);
+
+    // Warm bowed string cello/bass tone (triangle with soft lowpass)
+    const osc = this.ctx.createOscillator();
+    const filter = this.ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(320, now);
+
+    const gain = this.ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(freq, now);
+
+    gain.gain.setValueAtTime(0.01, now);
+    gain.gain.linearRampToValueAtTime(0.5, now + 0.25);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + duration * 1.1);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(droneGain);
+
+    osc.start(now);
+    osc.stop(now + duration * 1.1);
+  }
+
+  // Play step in loop
   playStep() {
     if (!this.isPlaying) return;
 
@@ -209,39 +221,38 @@ class CelebrationAudioManager {
     if (!track) return;
 
     const step = track.steps[this.currentStep];
-    const beatDurationMs = (60 / track.tempo) * 1000;
+    const beatMs = (60 / track.tempo) * 1000;
+    const stepDurationMs = (step.dur || 1.0) * beatMs;
 
-    if (step.bass) {
-      this.playAcousticNote(step.bass, 'bass', (beatDurationMs / 1000) * 1.8);
-    }
-
-    if (step.chord && Array.isArray(step.chord)) {
-      step.chord.forEach((noteFreq, idx) => {
-        setTimeout(() => {
-          this.playAcousticNote(noteFreq, 'chord', (beatDurationMs / 1000) * 1.4);
-        }, idx * 15);
-      });
-    }
-
+    // 1. Play Celesta Lead
     if (step.lead && step.lead > 0) {
-      this.playAcousticNote(step.lead, 'lead', (beatDurationMs / 1000) * 1.6);
+      this.playCelestaNote(step.lead, Math.max(1.8, (stepDurationMs / 1000) * 1.6));
     }
 
+    // 2. Play Mysterious Orchestral Drone
+    if (step.drone && step.drone > 0) {
+      this.playOrchestralDrone(step.drone, (stepDurationMs / 1000) * 1.2);
+    }
+
+    // 3. Update lyric/moment tag
     if (this.onProgressCallback && step.tag) {
       this.onProgressCallback(step.tag);
     }
 
+    // Advance step
     this.currentStep = (this.currentStep + 1) % track.steps.length;
 
     this.loopTimer = setTimeout(() => {
       this.playStep();
-    }, beatDurationMs);
+    }, stepDurationMs);
   }
 
   startMusic(trackId = null, onProgress = null) {
     this.initContext();
     if (trackId && this.tracks[trackId]) {
       this.currentTrackId = trackId;
+    } else {
+      this.currentTrackId = 'harryPotter';
     }
     if (onProgress) {
       this.onProgressCallback = onProgress;
@@ -273,7 +284,7 @@ class CelebrationAudioManager {
       this.stopMusic();
       return false;
     } else {
-      return this.startMusic(trackId, onProgress);
+      return this.startMusic(trackId || 'harryPotter', onProgress);
     }
   }
 
@@ -290,9 +301,10 @@ class CelebrationAudioManager {
   }
 
   getCurrentTrackTitle() {
-    return this.tracks[this.currentTrackId]?.title || "Celebration Serenade";
+    return this.tracks[this.currentTrackId]?.title || "⚡ Harry Potter - Hedwig's Theme";
   }
 
+  // Interactive Sound Effects
   playBlowingSound() {
     this.initContext();
     if (!this.ctx || this.isMuted) return;
@@ -382,16 +394,17 @@ class CelebrationAudioManager {
     this.initContext();
     if (!this.ctx || this.isMuted) return;
 
+    // Magical celebratory fanfare
     const notes = [
-      { freq: 523.25, time: 0, dur: 0.2 },
-      { freq: 659.25, time: 0.15, dur: 0.2 },
-      { freq: 783.99, time: 0.3, dur: 0.3 },
-      { freq: 1046.50, time: 0.5, dur: 0.8 },
+      { freq: 493.88, time: 0, dur: 0.2 },    // B4
+      { freq: 659.25, time: 0.18, dur: 0.2 }, // E5
+      { freq: 783.99, time: 0.35, dur: 0.25 },// G5
+      { freq: 987.77, time: 0.55, dur: 0.8 }, // B5
     ];
 
     notes.forEach(n => {
       setTimeout(() => {
-        this.playAcousticNote(n.freq, 'lead', n.dur * 1.8);
+        this.playCelestaNote(n.freq, n.dur * 2.2);
       }, n.time * 1000);
     });
   }
