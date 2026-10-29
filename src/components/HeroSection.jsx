@@ -3,11 +3,14 @@ import BirthdayCake3D from './BirthdayCake3D';
 import ConfettiBlaster from './ConfettiBlaster';
 import { Sparkles, Heart, Crown, Calendar, Star } from 'lucide-react';
 
-export default function HeroSection({ lang }) {
+export default function HeroSection({ lang, onCandleBlownExtra }) {
   const [candlesBlownCount, setCandlesBlownCount] = useState(0);
 
   const handleCandlesBlown = () => {
     setCandlesBlownCount((prev) => prev + 1);
+    if (onCandleBlownExtra) {
+      onCandleBlownExtra();
+    }
   };
 
   return (
